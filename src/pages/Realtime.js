@@ -66,7 +66,7 @@ const Realtime = () => {
       recorder.onstart = () => {
         logRef.current.log(`MediaRecorder Started`)
         setRefresh(Math.random())
-        isRecordingRef.current = true;  
+        isRecordingRef.current = true;
         captureFrame();
 
       };
@@ -78,7 +78,7 @@ const Realtime = () => {
       recorder.onstop = async () => {
         setRefresh(Math.random())
         isRecordingRef.current = false;
-        clearTimeout(captureTimeout); 
+        clearTimeout(captureTimeout);
         logRef.current.log('MediaRecorder stopped');
       };
 
@@ -126,7 +126,15 @@ const Realtime = () => {
           <Button disabled={mediaRecorder?.state !== 'recording'} variant='contained' size='small' sx={{ my: 2 }} onClick={handleStop}>Stop</Button>
         )}
       </Box>
-      <canvas ref={canvasRef} style={{ display: "" }} ></canvas>  {/* Hidden canvas element */}
+      <Box sx={{ border: "1px solid red", width: [300, 600], height: [200, 400], mb:2 }}>
+        <canvas ref={canvasRef} style={{
+          display: "",
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+        }} ></canvas>  {/* Hidden canvas element */}
+      </Box>
+
       <Logs ref={logRef} />
 
     </Box>
