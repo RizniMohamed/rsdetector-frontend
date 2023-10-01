@@ -4,7 +4,6 @@ import video_img from '../images/video_default.jpeg'
 
 const Realtime = () => {
   const [mediaRecorder, setMediaRecorder] = useState(null);
-  const [frameInterval, setFrameInterval] = useState(null);
   const [logs, setLogs] = useState([]);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -30,6 +29,13 @@ const Realtime = () => {
     setLogs(prevLogs => [...prevLogs, `${getTimestamp()}: ${message}`])
   }
 
+  useEffect(() => {
+    if (logBoxRef.current) {
+      logBoxRef.current.scrollTop = logBoxRef.current.scrollHeight;
+    }
+  }, [logs]);
+
+
   const captureFrame = () => {
     if (videoRef.current && canvasRef.current) {
 
@@ -38,7 +44,6 @@ const Realtime = () => {
       canvas.width = 640;
       canvas.height = 480;
       context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-
 
       canvas.toBlob((blob, i) => {
         // Log the API call for now
@@ -49,12 +54,6 @@ const Realtime = () => {
     }
   };
 
-  useEffect(() => {
-    // Scroll to the bottom whenever logs are updated
-    if (logBoxRef.current) {
-      logBoxRef.current.scrollTop = logBoxRef.current.scrollHeight;
-    }
-  }, [logs]);
 
   const initVideo = async () => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -64,7 +63,6 @@ const Realtime = () => {
     }
 
     try {
-
       let interval = null
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -74,6 +72,7 @@ const Realtime = () => {
         }
       });
       const recorder = new MediaRecorder(stream);
+      setMediaRecorder(recorder);
 
       recorder.onstart = () => {
         log(`MediaRecorder Started`)
@@ -83,27 +82,10 @@ const Realtime = () => {
       recorder.onerror = (event) => {
         log('MediaRecorder error: ', event.error);
       };
-      setMediaRecorder(recorder);
-
-      // const chunks = [];
-      // recorder.ondataavailable = (event) => {
-      //   chunks.push(event.data);
-      // };
 
       recorder.onstop = async () => {
-        // const blob = new Blob(chunks, { type: 'video/webm' });
         clearInterval(interval);
         log('MediaRecorder stopped');
-        
-        // Reset the videoRef and canvasRef
-        if (videoRef.current) {
-          videoRef.current.srcObject = null;
-        }
-        if (canvasRef.current) {
-          const context = canvasRef.current.getContext('2d');
-          context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-        }
-
       };
 
       videoRef.current.srcObject = stream;
@@ -130,17 +112,6 @@ const Realtime = () => {
   const handleStart = () => {
     if (mediaRecorder) {
       mediaRecorder.start();
-
-      // navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-      //   .then(stream => {
-      //     if (videoRef.current) {
-      //       videoRef.current.srcObject = stream;
-      //     }
-      //   })
-      //   .catch(error => {
-      //     log('Error accessing media devices.');
-      //     console.error('Error accessing media devices.', error);
-      //   });
     }
   };
 
@@ -154,18 +125,20 @@ const Realtime = () => {
         }} autoPlay muted></video>
       </Box>
       <Box display="flex">
-        <Button variant='contained' size='small' sx={{ my: 2, mr: 2 }} onClick={handleStart}>Start</Button>
-        <Button variant='contained' size='small' sx={{ my: 2, mr: 2 }} onClick={handleStop}>Stop</Button>
+        {mediaRecorder?.state === 'inactive' ? (
+          <Button disabled={mediaRecorder?.state !== 'inactive'} variant='contained' size='small' sx={{ my: 2 }} onClick={handleStart}>Start</Button>
+        ) : (
+          <Button disabled={mediaRecorder?.state !== 'recording'} variant='contained' size='small' sx={{ my: 2 }} onClick={handleStop}>Stop</Button>
+        )}
       </Box>
       <canvas ref={canvasRef} style={{ display: "none" }} ></canvas>  {/* Hidden canvas element */}
-
       <Box
-        ref={logBoxRef}  // Assign the ref to the log box
+        ref={logBoxRef}
         sx={{
           border: "1px solid red",
           width: [300, 600],
           height: [200, 400],
-          overflowY: 'auto'  // Make the box scrollable
+          overflowY: 'auto'
         }}
       >
         {logs.map((log, index) => (
