@@ -4,9 +4,10 @@ import video_img from '../images/video_default.jpeg'
 
 const Realtime = () => {
   const [mediaRecorder, setMediaRecorder] = useState(null);
-  const [logs, setLogs] = useState([]);  // New state variable for logs
+  const [logs, setLogs] = useState([]);  
   const videoRef = useRef(null);
-  const canvasRef = useRef(null);  // New canvas ref
+  const canvasRef = useRef(null); 
+
 
   function getTimestamp() {
     const now = new Date();
@@ -28,7 +29,7 @@ const Realtime = () => {
   }
 
   const captureFrame = () => {
-    if (videoRef.current && canvasRef.current) {
+    if (mediaRecorder && mediaRecorder.state === 'recording' && videoRef.current && canvasRef.current) {
       const canvas = canvasRef.current;
       const context = canvas.getContext('2d');
       canvas.width = videoRef.current.videoWidth;
