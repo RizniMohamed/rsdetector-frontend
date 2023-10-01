@@ -4,6 +4,7 @@ import video_img from '../images/video_default.jpeg'
 
 const Realtime = () => {
   const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [frameInterval, setFrameInterval] = useState(null);
   const [logs, setLogs] = useState([]);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -30,7 +31,8 @@ const Realtime = () => {
   }
 
   const captureFrame = () => {
-    if (mediaRecorder && mediaRecorder.state === 'recording' && videoRef.current && canvasRef.current) {
+    if (videoRef.current && canvasRef.current) {
+
       const canvas = canvasRef.current;
       const context = canvas.getContext('2d');
       canvas.width = 640;
@@ -54,18 +56,6 @@ const Realtime = () => {
     }
   }, [logs]);
 
-  useEffect(() => {
-    let frameInterval;
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
-      frameInterval = setInterval(captureFrame, 100);  // Set interval to capture frames every 100ms (10 frames per second)
-    }
-
-    return () => {
-      clearInterval(frameInterval);  // Clear interval when component is unmounted or mediaRecorder state changes
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mediaRecorder?.state]);
-
   const initVideo = async () => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       log(`MediaRecorder configuration Failed`)
@@ -74,6 +64,8 @@ const Realtime = () => {
     }
 
     try {
+
+      let interval = null
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: "environment",
@@ -85,6 +77,7 @@ const Realtime = () => {
 
       recorder.onstart = () => {
         log(`MediaRecorder Started`)
+        interval = setInterval(captureFrame, 100);
       };
 
       recorder.onerror = (event) => {
@@ -92,16 +85,16 @@ const Realtime = () => {
       };
       setMediaRecorder(recorder);
 
-      const chunks = [];
-      recorder.ondataavailable = (event) => {
-        chunks.push(event.data);
-      };
+      // const chunks = [];
+      // recorder.ondataavailable = (event) => {
+      //   chunks.push(event.data);
+      // };
 
       recorder.onstop = async () => {
         // const blob = new Blob(chunks, { type: 'video/webm' });
+        clearInterval(interval);
         log('MediaRecorder stopped');
-
-
+        
         // Reset the videoRef and canvasRef
         if (videoRef.current) {
           videoRef.current.srcObject = null;
@@ -136,17 +129,18 @@ const Realtime = () => {
 
   const handleStart = () => {
     if (mediaRecorder) {
-      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-        .then(stream => {
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-          }
-          mediaRecorder.start();
-        })
-        .catch(error => {
-          log('Error accessing media devices.');
-          console.error('Error accessing media devices.', error);
-        });
+      mediaRecorder.start();
+
+      // navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+      //   .then(stream => {
+      //     if (videoRef.current) {
+      //       videoRef.current.srcObject = stream;
+      //     }
+      //   })
+      //   .catch(error => {
+      //     log('Error accessing media devices.');
+      //     console.error('Error accessing media devices.', error);
+      //   });
     }
   };
 
