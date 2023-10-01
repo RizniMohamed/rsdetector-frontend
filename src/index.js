@@ -10,10 +10,10 @@ const root = ReactDOM.createRoot(rootID);
 const theme = createTheme(Theme)
 
 root.render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router />
     </ThemeProvider>
-  </React.StrictMode>
+  // </React.StrictMode>
 );
