@@ -6,6 +6,7 @@ const Realtime = () => {
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [logs, setLogs] = useState([]);  // New state variable for logs
   const videoRef = useRef(null);
+  const canvasRef = useRef(null);  // New canvas ref
 
   function getTimestamp() {
     const now = new Date();
@@ -26,9 +27,39 @@ const Realtime = () => {
     setLogs(prevLogs => [...prevLogs, `${getTimestamp()}: ${message}`])
   }
 
+  const captureFrame = () => {
+    if (videoRef.current && canvasRef.current) {
+      const canvas = canvasRef.current;
+      const context = canvas.getContext('2d');
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
+      context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+
+
+      canvas.toBlob((blob,i) => {
+        // Log the API call for now
+        log(`blob ${i} ${blob.size}`);
+        // For future reference: send blob to your API
+        // sendFrameToAPI(blob);
+      });
+    }
+  };
+
+
+  useEffect(() => {
+    let frameInterval;
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      frameInterval = setInterval(captureFrame, 100);  // Set interval to capture frames every 100ms (10 frames per second)
+    }
+
+    return () => {
+      clearInterval(frameInterval);  // Clear interval when component is unmounted or mediaRecorder state changes
+    };
+  }, [mediaRecorder?.state]);
+
   const initVideo = async () => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      log(`Video configuration Failed`)
+      log(`MediaRecorder configuration Failed`)
       log(`MediaDevices API not supported on your device/browser.`)
       return;
     }
@@ -36,6 +67,14 @@ const Realtime = () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
       const recorder = new MediaRecorder(stream);
+
+      recorder.onstart = () => {
+        log(`MediaRecorder Started`)
+      };
+
+      recorder.onerror = (event) => {
+        log('MediaRecorder error: ', event.error);
+      };
       setMediaRecorder(recorder);
 
       const chunks = [];
@@ -45,12 +84,13 @@ const Realtime = () => {
 
       recorder.onstop = async () => {
         const blob = new Blob(chunks, { type: 'video/webm' });
+        log('MediaRecorder stopped');
         log(`blob size ${blob.size}`)
         console.log('blob', blob)
       };
 
       videoRef.current.srcObject = stream;
-      log(`Video configuration initiated`)
+      log(`MediaRecorder configuration initiated`)
 
     } catch (error) {
       log('Error accessing media devices.')
@@ -66,14 +106,12 @@ const Realtime = () => {
   const handleStop = () => {
     if (mediaRecorder) {
       mediaRecorder.stop();
-      log(`Video caputure stopped`)
     }
   };
 
   const handleStart = () => {
     if (mediaRecorder) {
       mediaRecorder.start()
-      log(`Video caputure Started`)
     }
   };
 
@@ -90,6 +128,8 @@ const Realtime = () => {
         <Button variant='contained' size='small' sx={{ my: 2, mr: 2 }} onClick={handleStart}>Start</Button>
         <Button variant='contained' size='small' sx={{ my: 2, mr: 2 }} onClick={handleStop}>Stop</Button>
       </Box>
+      <canvas ref={canvasRef} style={{display:"none"}} ></canvas>  {/* Hidden canvas element */}
+
       <Box sx={{
         border: "1px solid red",
         width: [300, 600],
