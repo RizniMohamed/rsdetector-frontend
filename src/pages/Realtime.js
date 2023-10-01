@@ -1,69 +1,58 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, Button } from '@mui/material';
 import video_img from '../images/video_default.jpeg'
+import Logs from '../components/Logs';
 
 const Realtime = () => {
   const [mediaRecorder, setMediaRecorder] = useState(null);
-  const [logs, setLogs] = useState([]);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
-  const logBoxRef = useRef(null);
+  // eslint-disable-next-line
+  const [refresh, setRefresh] = useState(false);
+  const logRef = useRef();
+  const isRecordingRef = useRef(false);
+
+  let captureTimeout = null;  // Declare captureTimeout variable outside of functions
 
 
-  function getTimestamp() {
-    const now = new Date();
-
-    const day = String(now.getDate()).padStart(2, '0');
-    const month = String(now.getMonth() + 1).padStart(2, '0');  // Months are 0-indexed
-    const year = now.getFullYear();
-
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-
-    const timestamp = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
-    return timestamp;
-  }
-
-  const log = (message) => {
-    setLogs(prevLogs => [...prevLogs, `${getTimestamp()}: ${message}`])
-  }
-
-  useEffect(() => {
-    if (logBoxRef.current) {
-      logBoxRef.current.scrollTop = logBoxRef.current.scrollHeight;
+  const captureFrame = async () => {
+    console.log(isRecordingRef.current);
+    if (!isRecordingRef.current || !videoRef.current || !canvasRef.current) {
+      return;  // Exit function if not recording or refs are null
     }
-  }, [logs]);
+
+    const canvas = canvasRef.current;
+    const context = canvas.getContext('2d');
+    canvas.width = 640;
+    canvas.height = 480;
+    context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+
+    canvas.toBlob(async (blob) => {
+      await sendFrameToAPI(blob);  // Wait for the API call to complete
+      captureTimeout = setTimeout(captureFrame, 100);  // Then wait an additional 100ms before capturing the next frame
+    });
+  };
 
 
-  const captureFrame = () => {
-    if (videoRef.current && canvasRef.current) {
 
-      const canvas = canvasRef.current;
-      const context = canvas.getContext('2d');
-      canvas.width = 640;
-      canvas.height = 480;
-      context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-
-      canvas.toBlob((blob, i) => {
-        // Log the API call for now
-        log(`blob ${blob.size}`);
-        // For future reference: send blob to your API
-        // sendFrameToAPI(blob);
-      });
-    }
+  const sendFrameToAPI = async (blob) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        logRef.current.log(`blob ${blob.size} from api`);
+        resolve();
+      }, 1000);  // 1 second delay to simulate API call
+    });
   };
 
 
   const initVideo = async () => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      log(`MediaRecorder configuration Failed`)
-      log(`MediaDevices API not supported on your device/browser.`)
+      logRef.current.log(`MediaRecorder configuration Failed`)
+      logRef.current.log(`MediaDevices API not supported on your device/browser.`)
       return;
     }
 
     try {
-      let interval = null
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: "environment",
@@ -75,24 +64,29 @@ const Realtime = () => {
       setMediaRecorder(recorder);
 
       recorder.onstart = () => {
-        log(`MediaRecorder Started`)
-        interval = setInterval(captureFrame, 100);
+        logRef.current.log(`MediaRecorder Started`)
+        setRefresh(Math.random())
+        isRecordingRef.current = true;  
+        captureFrame();
+
       };
 
       recorder.onerror = (event) => {
-        log('MediaRecorder error: ', event.error);
+        logRef.current.log('MediaRecorder error: ', event.error);
       };
 
       recorder.onstop = async () => {
-        clearInterval(interval);
-        log('MediaRecorder stopped');
+        setRefresh(Math.random())
+        isRecordingRef.current = false;
+        clearTimeout(captureTimeout); 
+        logRef.current.log('MediaRecorder stopped');
       };
 
       videoRef.current.srcObject = stream;
-      log(`MediaRecorder configuration initiated`)
+      logRef.current.log(`MediaRecorder configuration initiated`)
 
     } catch (error) {
-      log('Error accessing media devices.')
+      logRef.current.log('Error accessing media devices.')
       console.error('Error accessing media devices.', error);
     }
   };
@@ -102,18 +96,19 @@ const Realtime = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-
-  const handleStop = () => {
-    if (mediaRecorder) {
-      mediaRecorder.stop();
-    }
-  };
-
   const handleStart = () => {
     if (mediaRecorder) {
       mediaRecorder.start();
     }
   };
+
+  const handleStop = () => {
+    if (mediaRecorder) {
+      mediaRecorder.stop();
+    }
+
+  };
+
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center" my={10}>
@@ -131,20 +126,9 @@ const Realtime = () => {
           <Button disabled={mediaRecorder?.state !== 'recording'} variant='contained' size='small' sx={{ my: 2 }} onClick={handleStop}>Stop</Button>
         )}
       </Box>
-      <canvas ref={canvasRef} style={{ display: "none" }} ></canvas>  {/* Hidden canvas element */}
-      <Box
-        ref={logBoxRef}
-        sx={{
-          border: "1px solid red",
-          width: [300, 600],
-          height: [200, 400],
-          overflowY: 'auto'
-        }}
-      >
-        {logs.map((log, index) => (
-          <div key={index}>{log}</div>
-        ))}
-      </Box>
+      <canvas ref={canvasRef} style={{ display: "" }} ></canvas>  {/* Hidden canvas element */}
+      <Logs ref={logRef} />
+
     </Box>
   );
 };
