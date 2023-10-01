@@ -3,7 +3,7 @@ import { ThemeProvider } from "@emotion/react";
 import { CssBaseline, createTheme } from '@mui/material';
 import ReactDOM from 'react-dom/client';
 import Theme from './theme'
-import App from './App'
+import Router from './Router'
 
 const rootID = document.getElementById('root')
 const root = ReactDOM.createRoot(rootID);
@@ -13,7 +13,7 @@ root.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <App />
+      <Router />
     </ThemeProvider>
   </React.StrictMode>
 );

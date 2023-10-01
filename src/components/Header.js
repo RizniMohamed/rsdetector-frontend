@@ -8,16 +8,22 @@ import * as React from 'react';
 import Logo from './Logo';
 import { useTheme } from '@emotion/react';
 import { useMediaQuery } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
-const pages = ['Home', 'Real Time', 'Uploads'];
+const pages = [
+    { name: 'Home', path: "" },
+    { name: 'Real Time', path: "realtime" },
+    { name: 'Uploads', path: "uploads" },
+];
 
 function Header({ page, setPage }) {
 
     const theme = useTheme();
     const sm = useMediaQuery(theme.breakpoints.down('sm'));
+    const navigate = useNavigate();
 
     const handlePages = (page) => {
-        setPage(page)
+        navigate("/"+page);
     };
 
     return (
@@ -67,11 +73,11 @@ function Header({ page, setPage }) {
                         <Box sx={{ flexGrow: 1, display: 'flex' }}>
                             {pages.map((page) => (
                                 <Button
-                                    key={page}
-                                    onClick={() => handlePages(page)}
+                                    key={page.name}
+                                    onClick={() => handlePages(page.path)}
                                     sx={theme => { return { my: 2, color: 'white', borderBottom: "1.5px solid white", mr: 1, fontWeight: 700, width: 90, padding: 0, borderRadius: 1 } }}
                                 >
-                                    {page}
+                                    {page.name}
                                 </Button>
                             ))}
                         </Box>
@@ -87,11 +93,11 @@ function Header({ page, setPage }) {
                 <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: "space-evenly"}}>
                     {pages.map((page) => (
                         <Button
-                            key={page}
-                            onClick={() => handlePages(page)}
+                            key={page.name}
+                            onClick={() => handlePages(page.path)}
                             sx={theme => { return { my: 2, color: 'white', borderBottom: "1.5px solid white", mr: 1, fontWeight: 700, width: 90, padding: 0, borderRadius: 1 } }}
                         >
-                            {page}
+                            {page.name}
                         </Button>
                     ))}
                 </Box>
