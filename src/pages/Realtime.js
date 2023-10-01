@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Box, Button } from '@mui/material';
 import video_img from '../images/video_default.jpeg'
 import Logs from '../components/Logs';
+import { send_blob } from '../api'
 
 const Realtime = () => {
   const [mediaRecorder, setMediaRecorder] = useState(null);
@@ -16,7 +17,6 @@ const Realtime = () => {
 
 
   const captureFrame = async () => {
-    console.log(isRecordingRef.current);
     if (!isRecordingRef.current || !videoRef.current || !canvasRef.current) {
       return;  // Exit function if not recording or refs are null
     }
@@ -36,12 +36,11 @@ const Realtime = () => {
 
 
   const sendFrameToAPI = async (blob) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        logRef.current.log(`blob ${blob.size} from api`);
-        resolve();
-      }, 1000);  // 1 second delay to simulate API call
-    });
+    const formData = new FormData();
+    formData.append('file', blob);
+    const response = await send_blob(formData)
+    console.log("response",response);
+    logRef.current.log(`Sign identified ${response.status}`)
   };
 
 
@@ -126,7 +125,7 @@ const Realtime = () => {
           <Button disabled={mediaRecorder?.state !== 'recording'} variant='contained' size='small' sx={{ my: 2 }} onClick={handleStop}>Stop</Button>
         )}
       </Box>
-      <Box sx={{ border: "1px solid red", width: [300, 600], height: [200, 400], mb:2 }}>
+      <Box sx={{ border: "1px solid red", width: [300, 600], height: [200, 400], mb: 2 }}>
         <canvas ref={canvasRef} style={{
           display: "",
           width: '100%',
