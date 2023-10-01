@@ -36,7 +36,7 @@ const Realtime = () => {
       context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 
 
-      canvas.toBlob((blob,i) => {
+      canvas.toBlob((blob, i) => {
         // Log the API call for now
         log(`blob ${i} ${blob.size}`);
         // For future reference: send blob to your API
@@ -55,6 +55,7 @@ const Realtime = () => {
     return () => {
       clearInterval(frameInterval);  // Clear interval when component is unmounted or mediaRecorder state changes
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mediaRecorder?.state]);
 
   const initVideo = async () => {
@@ -100,6 +101,7 @@ const Realtime = () => {
 
   useEffect(() => {
     initVideo()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
 
@@ -128,7 +130,7 @@ const Realtime = () => {
         <Button variant='contained' size='small' sx={{ my: 2, mr: 2 }} onClick={handleStart}>Start</Button>
         <Button variant='contained' size='small' sx={{ my: 2, mr: 2 }} onClick={handleStop}>Stop</Button>
       </Box>
-      <canvas ref={canvasRef} style={{display:"none"}} ></canvas>  {/* Hidden canvas element */}
+      <canvas ref={canvasRef} style={{ display: "none" }} ></canvas>  {/* Hidden canvas element */}
 
       <Box sx={{
         border: "1px solid red",
