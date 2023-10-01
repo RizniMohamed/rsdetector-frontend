@@ -33,8 +33,8 @@ const Realtime = () => {
     if (mediaRecorder && mediaRecorder.state === 'recording' && videoRef.current && canvasRef.current) {
       const canvas = canvasRef.current;
       const context = canvas.getContext('2d');
-      canvas.width = videoRef.current.videoWidth;
-      canvas.height = videoRef.current.videoHeight;
+      canvas.width = 640;
+      canvas.height = 480;
       context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 
 
@@ -74,7 +74,13 @@ const Realtime = () => {
     }
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "environment",
+          width: { exact: 640 },
+          height: { exact: 480 }
+        }
+      });
       const recorder = new MediaRecorder(stream);
 
       recorder.onstart = () => {
