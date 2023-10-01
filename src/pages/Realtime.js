@@ -38,7 +38,7 @@ const Realtime = () => {
 
       canvas.toBlob((blob, i) => {
         // Log the API call for now
-        log(`blob ${i} ${blob.size}`);
+        log(`blob ${blob.size}`);
         // For future reference: send blob to your API
         // sendFrameToAPI(blob);
       });
@@ -84,10 +84,8 @@ const Realtime = () => {
       };
 
       recorder.onstop = async () => {
-        const blob = new Blob(chunks, { type: 'video/webm' });
+        // const blob = new Blob(chunks, { type: 'video/webm' });
         log('MediaRecorder stopped');
-        log(`blob size ${blob.size}`)
-        console.log('blob', blob)
       };
 
       videoRef.current.srcObject = stream;
