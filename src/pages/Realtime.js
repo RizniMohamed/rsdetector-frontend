@@ -4,9 +4,10 @@ import video_img from '../images/video_default.jpeg'
 
 const Realtime = () => {
   const [mediaRecorder, setMediaRecorder] = useState(null);
-  const [logs, setLogs] = useState([]);  
+  const [logs, setLogs] = useState([]);
   const videoRef = useRef(null);
-  const canvasRef = useRef(null); 
+  const canvasRef = useRef(null);
+  const logBoxRef = useRef(null);
 
 
   function getTimestamp() {
@@ -46,6 +47,12 @@ const Realtime = () => {
     }
   };
 
+  useEffect(() => {
+    // Scroll to the bottom whenever logs are updated
+    if (logBoxRef.current) {
+      logBoxRef.current.scrollTop = logBoxRef.current.scrollHeight;
+    }
+  }, [logs]);
 
   useEffect(() => {
     let frameInterval;
@@ -87,6 +94,17 @@ const Realtime = () => {
       recorder.onstop = async () => {
         // const blob = new Blob(chunks, { type: 'video/webm' });
         log('MediaRecorder stopped');
+
+
+        // Reset the videoRef and canvasRef
+        if (videoRef.current) {
+          videoRef.current.srcObject = null;
+        }
+        if (canvasRef.current) {
+          const context = canvasRef.current.getContext('2d');
+          context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+        }
+
       };
 
       videoRef.current.srcObject = stream;
@@ -112,7 +130,17 @@ const Realtime = () => {
 
   const handleStart = () => {
     if (mediaRecorder) {
-      mediaRecorder.start()
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+        .then(stream => {
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+          }
+          mediaRecorder.start();
+        })
+        .catch(error => {
+          log('Error accessing media devices.');
+          console.error('Error accessing media devices.', error);
+        });
     }
   };
 
@@ -131,12 +159,15 @@ const Realtime = () => {
       </Box>
       <canvas ref={canvasRef} style={{ display: "none" }} ></canvas>  {/* Hidden canvas element */}
 
-      <Box sx={{
-        border: "1px solid red",
-        width: [300, 600],
-        height: [200, 400],
-        overflowY: 'auto'  // Make the box scrollable
-      }}>
+      <Box
+        ref={logBoxRef}  // Assign the ref to the log box
+        sx={{
+          border: "1px solid red",
+          width: [300, 600],
+          height: [200, 400],
+          overflowY: 'auto'  // Make the box scrollable
+        }}
+      >
         {logs.map((log, index) => (
           <div key={index}>{log}</div>
         ))}
