@@ -25,7 +25,7 @@ const Uploads = () => {
     // WebSocket initialization
     
     // socketRef.current = new WebSocket('ws://127.0.0.1:8000/ws');
-    socketRef.current = new WebSocket('ws://rsdetector.onrender.com/ws');
+    socketRef.current = new WebSocket('wss://rsdetector.onrender.com/ws');
 
     socketRef.current.onopen = () => {
       logRef.current.log('WebSocket Client Connected');
