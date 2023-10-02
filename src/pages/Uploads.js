@@ -85,7 +85,7 @@ const Uploads = () => {
             socketRef.current.send(buffer);
           });
         }
-      }, 500);  
+      }, 100);  
     } else {
       clearInterval(intervalRef.current);  
     }
