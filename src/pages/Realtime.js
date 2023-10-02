@@ -36,11 +36,18 @@ const Realtime = () => {
 
 
   const sendFrameToAPI = async (blob) => {
-    const formData = new FormData();
-    formData.append('file', blob);
-    const response = await send_blob(formData)
-    console.log("response",response);
-    logRef.current.log(`Sign identified ${response.status}`)
+
+    try {
+      const formData = new FormData();
+      formData.append('file', blob);
+      const response = await send_blob(formData)
+      console.log("response", response);
+      logRef.current.log(`Sign identified ${response.status}`)
+    } catch (error) {
+      logRef.current.log('Error on API call.')
+      console.error('Error on API call.', error);
+    }
+    
   };
 
 
@@ -54,9 +61,7 @@ const Realtime = () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: "environment",
-          width: { exact: 640 },
-          height: { exact: 480 }
+          facingMode: "environment"
         }
       });
       const recorder = new MediaRecorder(stream);
