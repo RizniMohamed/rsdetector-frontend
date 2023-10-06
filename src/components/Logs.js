@@ -40,8 +40,8 @@ const Logs = forwardRef((props, ref) => {
             ref={logBoxRef}
             sx={{
                 border: "1px solid red",
-                width: [300, 600],
-                height: [200, 400],
+                width: [16 * 22, 16 * 50],
+                height: [9 * 22, 9 * 50],
                 overflowY: 'auto'
             }}
         >

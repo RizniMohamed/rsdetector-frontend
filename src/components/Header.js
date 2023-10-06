@@ -13,41 +13,39 @@ import { useNavigate } from 'react-router-dom';
 const pages = [
     { name: 'Home', path: "" },
     { name: 'Real Time', path: "realtime" },
-    { name: 'Uploads', path: "uploads" },
 ];
 
 function Header({ page, setPage }) {
-
     const theme = useTheme();
     const sm = useMediaQuery(theme.breakpoints.down('sm'));
     const navigate = useNavigate();
 
     const handlePages = (page) => {
-        navigate("/"+page);
+        navigate("/" + page);
     };
 
     return (
-        <AppBar position="static">
-            <Container maxWidth="xl" sx={{ display: "flex", alignItems: "center", justifyContent: sm && "center", my: sm && 1 }}>
+        <AppBar position="static" sx={{ backgroundColor: 'primary.dark', boxShadow: 'none' }}>
+            <Container maxWidth="xl" sx={{ display: "flex", alignItems: "center", justifyContent: sm ? 'center' : 'flex-start', py: sm ? 1 : 2 }}>
                 <Box component="img" src={Logo} sx={{
                     width: 50,
                     height: 50,
-                    marginRight: 1,
-                    bgcolor: "white",
-                    padding: 0.5,
+                    marginRight: 2,
+                    bgcolor: "background.paper",
+                    p: 0.5,
                     borderRadius: 1,
                 }} />
-                <Toolbar disableGutters>
-                    <Box>
+                <Toolbar disableGutters sx={{ flexWrap: 'wrap' }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', mb: sm ? 2 : 0 }}>
                         <Typography
                             noWrap
                             sx={{
-                                m:0,
-                                p:0,
+                                m: 0,
+                                p: 0,
                                 mr: 2,
                                 fontWeight: 700,
-                                color: "white",
-                                fontSize:22,
+                                color: 'common.white',
+                                fontSize: 22,
                             }}
                         >
                             RSDetector
@@ -59,15 +57,13 @@ function Header({ page, setPage }) {
                                 p: 0,
                                 mr: 2,
                                 fontWeight: 500,
-                                color: "white",
-                                fontStyle:"italic"
-
+                                color: 'common.white',
+                                fontStyle: "italic"
                             }}
                         >
                             Detect, Alert, and Safety
                         </Typography>
                     </Box>
-
 
                     {!sm && (
                         <Box sx={{ flexGrow: 1, display: 'flex' }}>
@@ -75,27 +71,43 @@ function Header({ page, setPage }) {
                                 <Button
                                     key={page.name}
                                     onClick={() => handlePages(page.path)}
-                                    sx={theme => { return { my: 2, color: 'white', borderBottom: "1.5px solid white", mr: 1, fontWeight: 700, width: 90, padding: 0, borderRadius: 1 } }}
+                                    sx={{
+                                        my: 2,
+                                        color: 'common.white',
+                                        borderBottom: "1.5px solid transparent",
+                                        '&:hover': { borderBottom: "1.5px solid white" },
+                                        mr: 2,
+                                        fontWeight: 700,
+                                        width: 90,
+                                        padding: 0,
+                                        borderRadius: 1
+                                    }}
                                 >
                                     {page.name}
                                 </Button>
                             ))}
                         </Box>
                     )}
-
                 </Toolbar>
-
-
-
             </Container>
 
             {sm && (
-                <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: "space-evenly"}}>
+                <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: "space-evenly", bgcolor: 'primary.dark' }}>
                     {pages.map((page) => (
                         <Button
                             key={page.name}
                             onClick={() => handlePages(page.path)}
-                            sx={theme => { return { my: 2, color: 'white', borderBottom: "1.5px solid white", mr: 1, fontWeight: 700, width: 90, padding: 0, borderRadius: 1 } }}
+                            sx={{
+                                my: 2,
+                                color: 'common.white',
+                                borderBottom: "1.5px solid transparent",
+                                '&:hover': { borderBottom: "1.5px solid white" },
+                                mr: 1,
+                                fontWeight: 700,
+                                width: 90,
+                                padding: 0,
+                                borderRadius: 1
+                            }}
                         >
                             {page.name}
                         </Button>

@@ -23,8 +23,8 @@ const Realtime = () => {
 
     const canvas = canvasRef.current;
     const context = canvas.getContext('2d');
-    canvas.width = 640;
-    canvas.height = 480;
+    canvas.width = 9 * 100;
+    canvas.height = 16 * 100;
     context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 
     canvas.toBlob(async (blob) => {
@@ -33,6 +33,10 @@ const Realtime = () => {
     });
   };
 
+  const speak = (text) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    window.speechSynthesis.speak(utterance);
+  };
 
 
   const sendFrameToAPI = async (blob) => {
@@ -42,12 +46,15 @@ const Realtime = () => {
       formData.append('file', blob);
       const response = await send_blob(formData)
       console.log("response", response);
-      logRef.current.log(`Sign identified ${response.status}`)
+      if (response.message !== "No sign detected") {
+        speak(response.message)
+      }
+      logRef.current.log(`API Response:  ${response.message}`)
     } catch (error) {
       logRef.current.log('Error on API call.')
       console.error('Error on API call.', error);
     }
-    
+
   };
 
 
@@ -61,7 +68,9 @@ const Realtime = () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: "environment"
+          facingMode: "environment",
+          width: 16 * 100,
+          height: 9 * 100
         }
       });
       const recorder = new MediaRecorder(stream);
@@ -116,11 +125,11 @@ const Realtime = () => {
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center" my={10}>
-      <Box sx={{ border: "1px solid red", width: [300, 600], height: [200, 400], backgroundImage: `url(${video_img})`, backgroundRepeat: 'no-repeat', backgroundSize: "100% 100%" }}>
+      <Box sx={{ border: "1px solid red", width: [16 * 22, 16 * 50], height: [9 * 22, 9 * 50], backgroundImage: `url(${video_img})`, backgroundRepeat: 'no-repeat', backgroundSize: "100% 100%" }}>
         <video ref={videoRef} style={{
           width: '100%',
           height: '100%',
-          objectFit: 'cover',
+          objectFit: 'fill',
         }} autoPlay muted></video>
       </Box>
       <Box display="flex">
@@ -130,12 +139,12 @@ const Realtime = () => {
           <Button disabled={mediaRecorder?.state !== 'recording'} variant='contained' size='small' sx={{ my: 2 }} onClick={handleStop}>Stop</Button>
         )}
       </Box>
-      <Box sx={{ border: "1px solid red", width: [300, 600], height: [200, 400], mb: 2 }}>
+      <Box sx={{ border: "1px solid red", width: [16 * 22, 16 * 50], height: [9 * 22, 9 * 50], mb: 2 }}>
         <canvas ref={canvasRef} style={{
           display: "",
           width: '100%',
           height: '100%',
-          objectFit: 'cover',
+          objectFit: 'fill',
         }} ></canvas>  {/* Hidden canvas element */}
       </Box>
 
