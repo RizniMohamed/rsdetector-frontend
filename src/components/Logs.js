@@ -40,13 +40,13 @@ const Logs = forwardRef((props, ref) => {
             ref={logBoxRef}
             sx={{
                 border: "1px solid red",
-                width: [16 * 22, 16 * 50],
-                height: [9 * 22, 9 * 50],
-                overflowY: 'auto'
+                width: [640 / 1.8, 640 / 1.0], 
+                height: [640 / 1.8, 640 / 1.0],
+                overflowY: 'auto',
             }}
         >
             {logs.map((log, index) => (
-                <div key={index}>{log}</div>
+                <Box key={index} sx={{ whiteSpace: 'nowrap',fontSize:[12,15] }}>{log}</Box>
             ))}
         </Box>
     )

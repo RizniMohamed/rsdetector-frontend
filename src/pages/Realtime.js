@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Box, Button } from '@mui/material';
 import video_img from '../images/video_default.jpeg'
 import Logs from '../components/Logs';
-import { send_blob } from '../api'
+import { send_blob, get_token } from '../api'
 
 const Realtime = () => {
   const [mediaRecorder, setMediaRecorder] = useState(null);
@@ -23,8 +23,8 @@ const Realtime = () => {
 
     const canvas = canvasRef.current;
     const context = canvas.getContext('2d');
-    canvas.width = 9 * 100;
-    canvas.height = 16 * 100;
+    canvas.width = 640;
+    canvas.height = 640;
     context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 
     canvas.toBlob(async (blob) => {
@@ -42,17 +42,20 @@ const Realtime = () => {
   const sendFrameToAPI = async (blob) => {
 
     try {
+
+      const res_token = await get_token()
+      console.log(res_token);
       const formData = new FormData();
       formData.append('file', blob);
-      const response = await send_blob(formData)
+      const response = await send_blob(formData, res_token.access_token)
       console.log("response", response);
       if (response.message !== "No sign detected") {
         speak(response.message)
       }
       logRef.current.log(`API Response:  ${response.message}`)
     } catch (error) {
-      logRef.current.log('Error on API call.')
-      console.error('Error on API call.', error);
+      logRef.current.log(`Error on API call: ${error.response.data.detail}`)
+      console.error('Error on API call : ', error);
     }
 
   };
@@ -69,8 +72,8 @@ const Realtime = () => {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: "environment",
-          width: 16 * 100,
-          height: 9 * 100
+          width: 640,
+          height: 640
         }
       });
       const recorder = new MediaRecorder(stream);
@@ -124,8 +127,8 @@ const Realtime = () => {
 
 
   return (
-    <Box display="flex" flexDirection="column" alignItems="center" my={10}>
-      <Box sx={{ border: "1px solid red", width: [16 * 22, 16 * 50], height: [9 * 22, 9 * 50], backgroundImage: `url(${video_img})`, backgroundRepeat: 'no-repeat', backgroundSize: "100% 100%" }}>
+    <Box display="flex" flexDirection="column" alignItems="center" my={5}>
+      <Box sx={{ border: "1px solid red", width: [640 / 1.8, 640 / 1.0], height: [640 / 1.8, 640 / 1.0], backgroundImage: `url(${video_img})`, backgroundRepeat: 'no-repeat', backgroundSize: "100% 100%" }}>
         <video ref={videoRef} style={{
           width: '100%',
           height: '100%',
@@ -139,7 +142,7 @@ const Realtime = () => {
           <Button disabled={mediaRecorder?.state !== 'recording'} variant='contained' size='small' sx={{ my: 2 }} onClick={handleStop}>Stop</Button>
         )}
       </Box>
-      <Box sx={{ border: "1px solid red", width: [16 * 22, 16 * 50], height: [9 * 22, 9 * 50], mb: 2 }}>
+      <Box sx={{ border: "1px solid red", width: [640 / 1.8, 640 / 1.0], height: [640 / 1.8, 640 / 1.0], mb: 2 }}>
         <canvas ref={canvasRef} style={{
           display: "",
           width: '100%',
