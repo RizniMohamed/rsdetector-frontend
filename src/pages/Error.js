@@ -12,11 +12,11 @@ const NotFoundPage = () => {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: theme.palette.grey[200],
+        backgroundColor: "#232323",
       }
     }}>
       <Typography variant="h1" gutterBottom>
-        404
+        404 :(
       </Typography>
       <Typography variant="h5" gutterBottom>
         Page Not Found

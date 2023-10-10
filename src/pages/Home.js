@@ -1,49 +1,42 @@
+import { Box, Button, Typography } from '@mui/material';
 import React from 'react';
-import { Button, Typography, Container } from '@mui/material';
-import { Link } from 'react-router-dom';
+import logo from "../res/home/logo.png";
+import img_roadbg from "../res/home/roadbg.png";
+import roadbgshade from "../res/home/roadbgshade.png";
+import Realtime from '../components/Realtime'
 
 const Home = () => {
     return (
-        <Container sx={{
-            mt: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            textAlign: 'center'
-        }}>
-            <Typography variant="h2" gutterBottom sx={{ fontWeight: 'bold' }}>
-                Road Sign Detection
-            </Typography>
-            <Typography variant="body1" paragraph sx={{  color: "white" }}>
-                Welcome to our Road Sign Detection project. This project utilizes a custom CNN architecture and YOLO v8 for real-time road sign detection. Our model is capable of detecting 11 different road signs with an accuracy of 99%.
-            </Typography>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
-                Features:
-            </Typography>
-            <ul sx={{
-                listStyle: 'none',
-                pl: 0,
-                textAlign: 'left',
-                '& li': {
-                    mb: 1,
-                    '&::before': {
-                        content: '"• "',
-                        color: 'primary.main',
-                    }
-                }
-            }}>
-                <li>Real-time road sign detection</li>
-                <li>Audio feedback for detected signs</li>
-                <li>Detailed logging mechanism</li>
-                <li>JWT authentication</li>
-            </ul>
-            <Button variant="contained" color="primary" component={Link} to="/realtime" sx={{ mt: 4 }}>
-                Go to Real-Time Detection
-            </Button>
-            <Typography variant="body1" paragraph sx={{ mt: 8, color:"white" }}>
-                Our application employs JWT for secure authentication, ensuring a protected user experience.
-            </Typography>
-        </Container>
+        <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" px={[1,0]}>
+            <Box position="relative" width={["100%","1280px"]} height={["360px","700px"]}>
+                <Box component={'img'} position="absolute" width="100%" height="100%" sx={{ objectFit: "cover" }} src={img_roadbg} alt='road background' />
+                <Box component={'img'} position="absolute" width="100%" height="100%" sx={{ objectFit: "cover" }} src={roadbgshade} alt='road background shade' />
+                <Box component={'img'} position="absolute" width={["300px", "508px"]} sx={{ objectFit: "cover", top: ["60px", "137px"], left: ["30px", "385px"] }} src={logo} alt='road background shade' />
+                <Typography sx={{
+                    position: "absolute",
+                    top: ["97px", "200px"],
+                    left: ["95px", "495px"],
+                    color: "black",
+                    fontSize: [15,25],
+                    fontStyle: "italic",
+                    fontWeight: 600
+                }}>Detect, Alert, and Saftey</Typography>
+                <Box display="flex" flexDirection="column" mt={[4,2]} alignItems="center" justifyContent="center" position="absolute" width="100%" height="100%">
+                    <Typography sx={{
+                        color: "black !important",
+                        fontSize: [13,30],
+                        fontWeight: 600,
+                        fontFamily: "poppins",
+                        marginBottom: ["15px","20px"]
+                    }}>AI Powered Road Sign Detection & Audio Feedback</Typography>
+                </Box>
+            </Box>
+
+            <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" bgcolor="#232323" width={["100%", "1280px"]} >
+                <Realtime />
+            </Box>
+        </Box>
+
     );
 };
 

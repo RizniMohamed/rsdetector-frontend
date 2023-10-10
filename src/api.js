@@ -3,7 +3,7 @@ import axios from "axios";
 
 const API = axios.create({
     // baseURL: 'http://localhost:8000/V1/',
-    baseURL: 'https://881f-112-134-198-70.ngrok-free.app/V1/',
+    baseURL: 'https://rsdetector-backend.ngrok.app/V1/',
     
 });
 
@@ -32,4 +32,24 @@ export const get_token = async () => {
         throw e;
     }
 };
+
+
+export const register = async (send_data) => {
+    try {
+        const response = await API.post(`register`, send_data);
+        return response.data;
+    } catch (e) {
+        throw e;
+    }
+};
+
+export const login = async (send_data) => {
+    try {
+        const response = await API.post(`login`, send_data);
+        return response.data;
+    } catch (e) {
+        throw e;
+    }
+};
+
 

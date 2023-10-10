@@ -87,11 +87,11 @@ const theme = {
         },
         "type": "light",
         "primary": {
-            "main": '#181bad',
+            "main": '#ff0000',
 
         },
         "secondary": {
-            "main": '#353535',
+            "main": '#000',
         },
         "error": {
             "light": "#e57373",
@@ -129,8 +129,8 @@ const theme = {
         },
         "divider": "rgba(0, 0, 0, 0.12)",
         "background": {
-            default: '#252525',
-            paper: '#252525',
+            default: '#000',
+            paper: '#232323',
             mainbg: '#353535',
             secondarybg: '#646464',
 

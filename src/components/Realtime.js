@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, Button } from '@mui/material';
-import video_img from '../images/video_default.jpeg'
-import Logs from '../components/Logs';
+import video_img from '../res/home/video_placeholder.png'
+import Logs from './Logs';
 import { send_blob, get_token } from '../api'
 
 const Realtime = () => {
@@ -44,7 +44,6 @@ const Realtime = () => {
     try {
 
       const res_token = await get_token()
-      console.log(res_token);
       const formData = new FormData();
       formData.append('file', blob);
       const response = await send_blob(formData, res_token.access_token)
@@ -128,7 +127,7 @@ const Realtime = () => {
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center" my={5}>
-      <Box sx={{ border: "1px solid red", width: [640 / 1.8, 640 / 1.0], height: [640 / 1.8, 640 / 1.0], backgroundImage: `url(${video_img})`, backgroundRepeat: 'no-repeat', backgroundSize: "100% 100%" }}>
+      <Box sx={{ display: "flex",width: ["100%", 815], height: ["100%", 815], backgroundImage: `url(${video_img})`, backgroundRepeat: 'no-repeat', backgroundSize: "100% 100%" }}>
         <video ref={videoRef} style={{
           width: '100%',
           height: '100%',
@@ -142,7 +141,7 @@ const Realtime = () => {
           <Button disabled={mediaRecorder?.state !== 'recording'} variant='contained' size='small' sx={{ my: 2 }} onClick={handleStop}>Stop</Button>
         )}
       </Box>
-      <Box sx={{ border: "1px solid red", width: [640 / 1.8, 640 / 1.0], height: [640 / 1.8, 640 / 1.0], mb: 2 }}>
+      <Box sx={{ display:"none", border: "1px solid red", width: ["100%", 815], height: ["100%", 460], mb: 2 }}>
         <canvas ref={canvasRef} style={{
           display: "",
           width: '100%',
