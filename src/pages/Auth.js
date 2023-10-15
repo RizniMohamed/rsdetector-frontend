@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material';
-import React from 'react';
+import React, { useEffect } from 'react';
 import Login from '../components/Login';
 import bg from "../res/auth/bg.png";
 import mbg from "../res/auth/mobile/bg.png";
@@ -14,6 +14,13 @@ const Auth = () => {
 
     const theme = useTheme();
     const bigScreen = useMediaQuery(theme.breakpoints.up('sm'));
+
+    useEffect(() => {
+        if (localStorage.getItem('token')){
+            localStorage.removeItem('token')
+        }
+    }, [])
+    
 
     if (bigScreen)
         return (

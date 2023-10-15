@@ -3,6 +3,7 @@ import { Box, Button } from '@mui/material';
 import video_img from '../res/home/video_placeholder.png'
 import Logs from './Logs';
 import { send_blob, get_token } from '../api'
+import { useNavigate } from 'react-router-dom';
 
 const Realtime = () => {
   const [mediaRecorder, setMediaRecorder] = useState(null);
@@ -12,7 +13,7 @@ const Realtime = () => {
   const [refresh, setRefresh] = useState(false);
   const logRef = useRef();
   const isRecordingRef = useRef(false);
-
+  const navigate = useNavigate()
   let captureTimeout = null;  // Declare captureTimeout variable outside of functions
 
 
@@ -44,17 +45,18 @@ const Realtime = () => {
     try {
 
       const res_token = await get_token()
+      localStorage.setItem('token', res_token.access_token)
       const formData = new FormData();
       formData.append('file', blob);
       const response = await send_blob(formData, res_token.access_token)
-      console.log("response", response);
       if (response.message !== "No sign detected") {
         speak(response.message)
       }
       logRef.current.log(`API Response:  ${response.message}`)
     } catch (error) {
-      logRef.current.log(`Error on API call: ${error.response.data.detail}`)
-      console.error('Error on API call : ', error);
+      // logRef.current.log(`Error on API call: ${error.response.data.detail}`)
+      console.error('Error on API call : ', error.data);
+      navigate('/')
     }
 
   };
@@ -71,8 +73,14 @@ const Realtime = () => {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: "environment",
-          width: 640,
-          height: 640
+          video: {
+            width: 640,
+            height: 640
+          },
+          // video: {
+          //   width: { ideal: 640, max: 1280 },
+          //   height: { ideal: 640, max: 1280 }
+          // }
         }
       });
       const recorder = new MediaRecorder(stream);
@@ -88,6 +96,7 @@ const Realtime = () => {
 
       recorder.onerror = (event) => {
         logRef.current.log('MediaRecorder error: ', event.error);
+        console.log('MediaRecorder error: ', event);
       };
 
       recorder.onstop = async () => {
@@ -127,7 +136,7 @@ const Realtime = () => {
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center" my={5}>
-      <Box sx={{ display: "flex",width: ["100%", 815], height: ["100%", 815], backgroundImage: `url(${video_img})`, backgroundRepeat: 'no-repeat', backgroundSize: "100% 100%" }}>
+      <Box sx={{ display: "flex", width: ["100vw", 815], height: ["100vw", 815], backgroundImage: `url(${video_img})`, backgroundRepeat: 'no-repeat', backgroundSize: "100% 100%" }}>
         <video ref={videoRef} style={{
           width: '100%',
           height: '100%',
@@ -141,9 +150,9 @@ const Realtime = () => {
           <Button disabled={mediaRecorder?.state !== 'recording'} variant='contained' size='small' sx={{ my: 2 }} onClick={handleStop}>Stop</Button>
         )}
       </Box>
-      <Box sx={{ display:"none", border: "1px solid red", width: ["100%", 815], height: ["100%", 460], mb: 2 }}>
+      <Box sx={{ display: "block", border: "1px solid red", width: ["100vw", 815], height: ["100vw", 815], mb: 2 }}>
         <canvas ref={canvasRef} style={{
-          display: "",
+          display: "block",
           width: '100%',
           height: '100%',
           objectFit: 'fill',

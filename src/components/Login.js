@@ -31,8 +31,10 @@ const Login = () => {
     const handleLogin = async () => {
         if (validate()) {
             const resp = await login({ email, password })
-            if (resp.status === 0)
+            if (resp.status === 0){
+                localStorage.setItem("token", resp.access_token);
                 navigate('/home')
+            }
             else
                 alert(resp.message)
         }

@@ -4,7 +4,7 @@ import axios from "axios";
 const API = axios.create({
     // baseURL: 'http://localhost:8000/V1/',
     baseURL: 'https://rsdetector-backend.ngrok.app/V1/',
-    
+
 });
 
 
@@ -24,8 +24,8 @@ export const send_blob = async (send_data, token) => {
 
 export const get_token = async () => {
     try {
-        const response = await API.get(`token`,{
-            headers: { 'ngrok-skip-browser-warning': true}
+        const response = await API.get(`token`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         });
         return response.data;
     } catch (e) {
